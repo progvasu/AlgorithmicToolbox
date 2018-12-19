@@ -9,16 +9,15 @@ public class BinarySearch {
         while (left <= right)   {
             mid = (left + right) / 2;
             
-            if (a[mid] == x)
-                return a.length - mid;
-            
             if (a[mid] < x)
                 left = mid + 1;
-            else
+            else if (a[mid] > x)
                 right = mid - 1;
+            else 
+                return mid;
         }
 
-        return a.length - left;
+        return -1;
     }
 
     static int linearSearch(int[] a, int x) {
@@ -41,7 +40,7 @@ public class BinarySearch {
           b[i] = scanner.nextInt();
         }
         for (int i = 0; i < m; i++) {
-            //replace with the call to binarySearch when implemented
+            // replace with the call to binarySearch when implemented
             System.out.print(binarySearch(a, b[i]) + " ");
         }
     }

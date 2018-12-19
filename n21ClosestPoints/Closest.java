@@ -22,7 +22,10 @@ public class Closest {
     static double minimalDistance(int[] x, int y[]) {
         double ans = Double.POSITIVE_INFINITY;
         // write your code here
-        // step 1. 
+        // step 1 - sorting x and y
+        Arrays.sort(x);
+        Arrays.sort(y);
+        
         return ans;
     }
 

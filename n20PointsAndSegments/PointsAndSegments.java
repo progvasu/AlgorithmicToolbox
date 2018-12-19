@@ -1,63 +1,79 @@
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PointsAndSegments {
-    private static int binarySearchSmaller(int[] a, int x) {
-        int left = 0, right = a.length - 1, mid = -1;
+    static class Points implements Comparable<Points>{
+        int number;
+        char id;
         
-        while (left <= right)   {
-            mid = (left + right) / 2;
-            
-            if (a[mid] == x)
-                return mid + 1;
-            
-            if (a[mid] < x)
-                left = mid + 1;
-            else
-                right = mid - 1;
+        Points(int number, char id) {
+            this.number = number;
+            this.id = id;
         }
 
-        return left;
-    }
-    
-    private static int binarySearchBigger(int[] a, int x) {
-        int left = 0, right = a.length - 1, mid = -1;
-        
-        while (left <= right)   {
-            mid = (left + right) / 2;
-            
-            if (a[mid] == x)
-                return a.length - mid;
-            
-            if (a[mid] < x)
-                left = mid + 1;
-            else
-                right = mid - 1;
+        @Override
+        public int compareTo(Points o) {
+            if (this.number < o.number)
+                return -1;
+            else if (this.number == o.number)   {
+                if (this.id < o.id)
+                    return -1;
+                else if (this.id > o.id)
+                    return 1;
+                else 
+                    return 0;
+            }
+            else 
+                return 1;
         }
-
-        return a.length - left;
     }
     
-    private static int[] fastCountSegments(int[] starts, int[] ends, int[] points) {
-        int[] cnt = new int[points.length];
+    private static long[] fastCountSegments(int[] starts, int[] ends, int[] points) {
+        long[] cnt = new long[points.length];
         
-        // need to sort the start array
-        // then sort the end array
-        // then use binary search to find all s <= x
-        // and all l >= x
-        // then ans = s + l - n(starts.length())
+        // lets create a hash map of points with 'cnt' so that we can match them at the end
+        Map<Integer, Long> myMap = new HashMap<>();
+        for(int i = 0 ; i < points.length ; i++)  {
+            myMap.put(points[i], cnt[i]);
+        }
         
-        Arrays.sort(starts);
-        Arrays.sort(ends);
+        // Points array
+        List<Points> points_array = new ArrayList<>(starts.length * 2 + points.length);
         
-        int s, l, n = starts.length;
-                
-        // apply binary search for each point
+        // creating a new object for every point in starts, ends and points
+        for (int i = 0 ; i < starts.length ; i++)   {
+            points_array.add(new Points(starts[i], 'l'));
+            points_array.add(new Points(ends[i], 'r'));
+        }
         for (int i = 0 ; i < points.length ; i++)   {
-            s = binarySearchSmaller(starts, points[i]);
-            l = binarySearchBigger(ends, points[i]);
+            points_array.add(new Points(points[i], 'p'));
+        }
+        
+        // sorting points_array
+        Collections.sort(points_array);
+        
+        // counting for all points
+        long run_count_seg = 0;
+        Points temp_point;
+        for (int i = 0 ; i < points_array.size() ; i++) {
+            temp_point = points_array.get(i);
             
-            cnt[i] = s + l - n;
+            if (temp_point.id == 'l')
+                run_count_seg++;
+            else if (temp_point.id == 'r')
+                run_count_seg--;
+            else    {
+                myMap.put(temp_point.number, run_count_seg);
+            }
+        }
+        
+        // getting values out of the hash
+        for(int i = 0 ; i < cnt.length ; i++)   {
+            cnt[i] = myMap.get(points[i]);
         }
         
         return cnt;
@@ -90,11 +106,10 @@ public class PointsAndSegments {
         for (int i = 0; i < m; i++) {
             points[i] = scanner.nextInt();
         }
-        //use fastCountSegments
-        int[] cnt = fastCountSegments(starts, ends, points);
-        for (int x : cnt) {
+        // use fastCountSegments
+        long[] cnt = fastCountSegments(starts, ends, points);
+        for (long x : cnt) {
             System.out.print(x + " ");
         }
     }
 }
-
